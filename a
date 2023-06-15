@@ -1,0 +1,59 @@
+
+import scipy.stats as s
+
+def get_fdata(fname):
+
+  ret = []
+  
+  with open(fname) as f:
+    lines = f.readlines()[1:]
+
+  for line in lines:
+    ret.append([float(num) for num in line.split(",")])
+
+  return ret
+  
+m=get_fdata("Model_data.txt")
+q=get_fdata("Quasar_data.txt")
+
+# normalise
+wq = [val[0] for val in q]
+fq = [val[1] for val in q]
+peak = max(fq)
+nq = [val/peak for val in fq]
+
+#e=s.binned_statistic(nq, nq.copy(), "mean", 100)
+
+split = 20
+binned = []
+binned_flux = []
+current = wq[0]+split
+bin = []
+bin_flux = []
+i = 0
+try:
+ while True:
+  if wq[i] < current:
+    bin.append(nq[i])
+    bin_flux.append(wq[i])
+  else:
+    binned.append(bin)
+    binned_flux.append(bin_flux)
+    current += split
+    bin = []
+    bin_flux = []
+  i += 1
+except IndexError:
+  if len(bin) > 0:
+    binned.append(bin)
+    binned_flux.append(bin_flux)
+
+# finish smoothing
+smooth = [sum(bin)/len(bin) for bin in binned_flux]
+
+# separated array
+sep = []
+bins = 20
+for i in range(0, len(nq), bins):
+  #sep.append(nq[i]
+  pass
